@@ -1,0 +1,6 @@
+# Weather Sync Requirements
+# Install with: pip install -r weather_requirements.txt
+
+psycopg2-binary>=2.9.0
+requests>=2.31.0
+firebase-admin>=6.0.0

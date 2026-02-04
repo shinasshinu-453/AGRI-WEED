@@ -1,0 +1,5 @@
+{
+  "name": "Copy of AgriVision PD-YOLO",
+  "description": "A GenAI implementation of the PD-YOLO weed detection methodology using Gemini Vision API for multi-scale feature recognition in agriculture.",
+  "requestFramePermissions": []
+}
