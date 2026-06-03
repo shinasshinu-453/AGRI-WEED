@@ -27,9 +27,17 @@ export interface Detection {
     weedsDetected: number;
     cropsDetected: number;
     status: 'pending' | 'processed' | 'failed';
-    userId: string;
+    userId: string;       // Firebase UID — must match auth.uid for Firestore rules
+    userEmail?: string;   // human-readable email for admin display
     imageUrl?: string;
     cropType?: string;
+    location?: {
+        latitude: number;
+        longitude: number;
+        accuracy: number;
+        locationName?: string;
+    };
+    batchId?: string;
 }
 
 export interface User {

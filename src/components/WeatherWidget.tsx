@@ -23,8 +23,10 @@ import { Button } from './ui/button';
 export const WeatherWidget: React.FC<{
     latitude?: number;
     longitude?: number;
+    locationName?: string;
+    userId?: string;
     compact?: boolean;
-}> = ({ latitude, longitude, compact = false }) => {
+}> = ({ latitude, longitude, locationName, userId, compact = false }) => {
     const [weather, setWeather] = useState<WeatherData | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,17 @@ export const WeatherWidget: React.FC<{
         try {
             setLoading(true);
             setError(null);
-            const data = await getWeatherData(location.latitude, location.longitude);
+
+            // Always pass locationName and userId, even with default location
+            const effectiveLocationName = locationName ||
+                (latitude && longitude ? `${latitude.toFixed(4)}, ${longitude.toFixed(4)}` : 'Kerala, India');
+
+            const data = await getWeatherData(
+                location.latitude,
+                location.longitude,
+                effectiveLocationName,
+                userId || 'anonymous'
+            );
             if (data) {
                 setWeather(data);
             } else {
@@ -59,7 +71,7 @@ export const WeatherWidget: React.FC<{
 
     if (loading && !weather) {
         return (
-            <Card className="glass-effect border-white/20">
+            <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px', border: '1px solid #d8ddd3' }}>
                 <CardContent className="p-6">
                     <div className="flex items-center justify-center gap-2 text-muted-foreground">
                         <RefreshCw className="animate-spin" size={20} />
@@ -72,7 +84,7 @@ export const WeatherWidget: React.FC<{
 
     if (error && !weather) {
         return (
-            <Card className="glass-effect border-white/20">
+            <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px', border: '1px solid #d8ddd3' }}>
                 <CardContent className="p-6">
                     <div className="flex items-center gap-2 text-yellow-600">
                         <AlertTriangle size={20} />
@@ -98,7 +110,7 @@ export const WeatherWidget: React.FC<{
 
     if (compact) {
         return (
-            <Card className="glass-effect border-white/20">
+            <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px', border: '1px solid #d8ddd3' }}>
                 <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -136,7 +148,7 @@ export const WeatherWidget: React.FC<{
     }
 
     return (
-        <Card className="glass-effect border-white/20">
+        <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px', border: '1px solid #d8ddd3' }}>
             <CardHeader>
                 <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
@@ -162,7 +174,7 @@ export const WeatherWidget: React.FC<{
 
             <CardContent className="space-y-6">
                 {/* Current Weather */}
-                <div className="bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-xl p-6 border border-white/10">
+                <div className="rounded-xl p-6" style={{ background: 'linear-gradient(135deg, rgba(10, 61, 46, 0.06), rgba(90, 158, 111, 0.08))', border: '1px solid #d8ddd3' }}>
                     <div className="flex items-center justify-between mb-4">
                         <div>
                             <p className="text-sm text-muted-foreground mb-1">Current Conditions</p>
@@ -196,8 +208,8 @@ export const WeatherWidget: React.FC<{
 
                 {/* Spray Recommendation */}
                 <div className={`rounded-xl p-4 border ${sprayRec.canSpray
-                        ? 'bg-green-500/10 border-green-500/30'
-                        : 'bg-red-500/10 border-red-500/30'
+                    ? 'bg-green-500/10 border-green-500/30'
+                    : 'bg-red-500/10 border-red-500/30'
                     }`}>
                     <div className="flex items-start gap-3">
                         {sprayRec.canSpray ? (

@@ -98,7 +98,7 @@ export const onWeatherRequest = functions.firestore
 
             // 7. Save to Cache
             const locationKey = `${Math.round(lat * 100) / 100}_${Math.round(lon * 100) / 100}`;
-            await admin.firestore().collection('weather').document(locationKey).set(weatherData);
+            await admin.firestore().collection('weather').doc(locationKey).set(weatherData);
 
             // 8. Update request status
             await snapshot.ref.update({

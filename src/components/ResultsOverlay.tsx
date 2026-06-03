@@ -19,31 +19,31 @@ export const ResultsOverlay: React.FC<ResultsOverlayProps> = ({ imageSrc, result
   const getBoxColor = (type: string) => {
     return type === 'weed' ? 'border-red-500 bg-red-500/20' : 'border-emerald-500 bg-emerald-500/10';
   };
-  
+
   const getLabelColor = (type: string) => {
     return type === 'weed' ? 'bg-red-500' : 'bg-emerald-500';
   };
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden shadow-lg border border-slate-200 bg-slate-900 group">
-      <img 
-        src={imageSrc} 
-        alt="Analyzed Field" 
+    <div className="relative w-full rounded-2xl overflow-hidden shadow-md group" style={{ border: '1px solid #d8ddd3', background: '#0a3d2e' }}>
+      <img
+        src={imageSrc}
+        alt="Analyzed Field"
         className="w-full h-auto block"
         onLoad={handleImageLoad}
       />
-      
+
       {/* Legend */}
       {result && (
-        <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg z-40 border border-slate-200 flex flex-col gap-2">
-           <div className="flex items-center gap-2">
-             <div className="w-3 h-3 rounded-full bg-red-500"></div>
-             <span className="text-xs font-semibold text-slate-700">Weed</span>
-           </div>
-           <div className="flex items-center gap-2">
-             <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
-             <span className="text-xs font-semibold text-slate-700">Crop</span>
-           </div>
+        <div className="absolute bottom-4 right-4 backdrop-blur-sm p-3 rounded-xl shadow-lg z-40 flex flex-col gap-2" style={{ background: 'rgba(255,255,255,0.92)', border: '1px solid #d8ddd3' }}>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-red-500"></div>
+            <span className="text-xs font-semibold" style={{ color: '#0a3d2e' }}>Weed</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
+            <span className="text-xs font-semibold" style={{ color: '#0a3d2e' }}>Crop</span>
+          </div>
         </div>
       )}
 
@@ -60,44 +60,44 @@ export const ResultsOverlay: React.FC<ResultsOverlayProps> = ({ imageSrc, result
                 {result.detections.length} detection{result.detections.length !== 1 ? 's' : ''}
               </div>
               {result.detections.map((det, index) => {
-            // Convert normalized [0-1] coordinates from the server into percentages
-            const top = det.box.ymin * 100;
-            const left = det.box.xmin * 100;
-            const width = (det.box.xmax - det.box.xmin) * 100;
-            const height = (det.box.ymax - det.box.ymin) * 100;
+                // Convert normalized [0-1] coordinates from the server into percentages
+                const top = det.box.ymin * 100;
+                const left = det.box.xmin * 100;
+                const width = (det.box.xmax - det.box.xmin) * 100;
+                const height = (det.box.ymax - det.box.ymin) * 100;
 
-            const isHovered = hoveredBox === index;
+                const isHovered = hoveredBox === index;
 
-            return (
-              <div
-                key={index}
-                className={`absolute transition-all duration-200 border-2 pointer-events-auto cursor-help
+                return (
+                  <div
+                    key={index}
+                    className={`absolute transition-all duration-200 border-2 pointer-events-auto cursor-help
                   ${getBoxColor(det.type)} ${isHovered ? 'z-20 border-opacity-100 opacity-100' : 'border-opacity-70 opacity-80'}`}
-                style={{
-                  top: `${top}%`,
-                  left: `${left}%`,
-                  width: `${width}%`,
-                  height: `${height}%`,
-                }}
-                onMouseEnter={() => setHoveredBox(index)}
-                onMouseLeave={() => setHoveredBox(null)}
-              >
-                {/* Detection Label - mimics the bounding box labels in PD-YOLO */}
-                <div className={`absolute -top-7 left-0 px-2 py-0.5 text-xs font-bold text-white rounded-t shadow-sm flex items-center gap-1
+                    style={{
+                      top: `${top}%`,
+                      left: `${left}%`,
+                      width: `${width}%`,
+                      height: `${height}%`,
+                    }}
+                    onMouseEnter={() => setHoveredBox(index)}
+                    onMouseLeave={() => setHoveredBox(null)}
+                  >
+                    {/* Detection Label */}
+                    <div className={`absolute -top-7 left-0 px-2 py-0.5 text-xs font-bold text-white rounded-t shadow-sm flex items-center gap-1
                   ${getLabelColor(det.type)} ${isHovered ? 'opacity-100' : 'opacity-80'}`}>
-                  <span>{det.label}</span>
-                  <span className="opacity-75 text-[10px]">{Math.round(det.confidence * 100)}%</span>
-                </div>
-                
-                {/* Tooltip for morphological description (The "Feature Fusion" insight) */}
-                {isHovered && det.description && (
-                  <div className="absolute top-full mt-1 left-0 bg-slate-800 text-white text-xs p-2 rounded shadow-xl w-48 z-30 pointer-events-none">
-                    <p className="font-semibold mb-1">Morphology:</p>
-                    {det.description}
+                      <span>{det.type === 'crop' ? '🌾 Crop' : det.label}</span>
+                      <span className="opacity-75 text-[10px]">{Math.round(det.confidence * 100)}%</span>
+                    </div>
+
+                    {/* Tooltip for morphological description (The "Feature Fusion" insight) */}
+                    {isHovered && det.description && (
+                      <div className="absolute top-full mt-1 left-0 text-white text-xs p-2 rounded-xl shadow-xl w-48 z-30 pointer-events-none" style={{ background: '#0a3d2e' }}>
+                        <p className="font-semibold mb-1">Morphology:</p>
+                        {det.description}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            );
+                );
               })}
             </>
           )}

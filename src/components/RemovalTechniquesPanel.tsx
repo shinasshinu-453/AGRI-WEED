@@ -34,14 +34,14 @@ const RemovalTechniquesPanel: React.FC<RemovalTechniquesPanelProps> = ({ techniq
     return (
         <div className="removal-techniques-panel" style={{
             backgroundColor: '#ffffff',
-            border: '2px solid #e5e7eb',
-            borderRadius: '12px',
+            border: '1px solid #d8ddd3',
+            borderRadius: '20px',
             padding: '20px',
             marginBottom: '20px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            boxShadow: '0 2px 16px rgba(10, 61, 46, 0.06)'
         }}>
             <div style={{ marginBottom: '16px' }}>
-                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', marginBottom: '8px' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', marginBottom: '8px', color: '#0a3d2e' }}>
                     🌿 Weed Removal Techniques
                 </h3>
                 {techniques.timing && (

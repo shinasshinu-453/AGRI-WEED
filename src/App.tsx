@@ -35,7 +35,7 @@ const App: React.FC = () => {
             )
           }
         />
-        
+
         <Route
           path="/dashboard"
           element={
@@ -44,7 +44,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/admin"
           element={
@@ -53,7 +53,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
-        
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

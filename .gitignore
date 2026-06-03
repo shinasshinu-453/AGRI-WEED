@@ -34,9 +34,11 @@ __pycache__/
 *$py.class
 *.so
 
-# YOLO Model Weights
-*.pt
+# YOLO Model Weights (root level)
+/*.pt
 runs/
+# Allow models/ directory (tracked, but weights inside are ignored)
+# To include your trained model: git add -f models/best.pt
 
 # Database Files
 *.sqlite

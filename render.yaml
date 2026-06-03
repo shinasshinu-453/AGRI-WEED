@@ -1,0 +1,38 @@
+# Render.com Service Configuration
+# https://render.com/docs/yaml-spec
+
+services:
+  - type: web
+    name: agroweed-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon  # or: frankfurt, singapore, ohio
+    
+    # Environment variables — set SECRET values in the Render dashboard
+    envVars:
+      - key: VITE_GEMINI_API_KEY
+        sync: false  # Set this in Render dashboard (secret)
+      - key: VITE_FIREBASE_API_KEY
+        sync: false  # Set this in Render dashboard (secret)
+      - key: VITE_FIREBASE_AUTH_DOMAIN
+        value: agroweed-adb78.firebaseapp.com
+      - key: VITE_FIREBASE_PROJECT_ID
+        value: agroweed-adb78
+      - key: VITE_FIREBASE_STORAGE_BUCKET
+        value: agroweed-adb78.appspot.com
+      - key: VITE_FIREBASE_MESSAGING_SENDER_ID
+        value: "897759037080"
+      - key: VITE_FIREBASE_APP_ID
+        sync: false  # Set in Render dashboard
+      - key: ROBOFLOW_API_KEY
+        sync: false  # Set in Render dashboard (secret)
+      - key: ROBOFLOW_WORKSPACE
+        value: weed-ryn8z
+      - key: ROBOFLOW_PROJECT
+        value: my-first-project-9fmyh
+      - key: ROBOFLOW_VERSION
+        value: "6"
+
+    # Health check endpoint
+    healthCheckPath: /health

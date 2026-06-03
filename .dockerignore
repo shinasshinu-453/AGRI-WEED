@@ -1,0 +1,81 @@
+# Git
+.git
+.gitignore
+
+# Node
+node_modules
+dist
+src
+*.ts
+*.tsx
+*.css
+package.json
+package-lock.json
+tsconfig.json
+vite.config.ts
+components.json
+index.html
+
+# Python cache
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.coverage
+
+# Notebooks and scripts
+*.ipynb
+colab_*.py
+train_*.py
+evaluate_*.py
+download_*.py
+organize_*.py
+merge_*.py
+check_*.py
+validate_*.py
+fix_*.py
+generate_*.py
+plot_*.py
+confusion_*.py
+uptrain_*.py
+retrain_*.py
+update_*.py
+sync_*.py
+run_*.py
+kk.py
+
+# Large YOLO model files NOT in models/ directory
+yolov8m.pt
+runs/
+
+# Docs and configs
+*.md
+*.txt
+!requirements.txt
+FIREBASE_SETUP.md
+NGROK_SETUP.md
+ROBOFLOW_SETUP.md
+
+# Keys and local env
+.env.local
+serviceAccountKey.json
+
+# Databases
+*.sqlite
+
+# Test files
+tests/
+test_*.py
+test_*.html
+
+# Datasets
+data.yaml
+dataset*/
+
+# Other
+.zencoder
+.zenflow
+.agent
+start-all.ps1
+stop-all.ps1
+run_weather_sync.bat

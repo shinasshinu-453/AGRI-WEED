@@ -56,7 +56,7 @@ export const AdminDashboard: React.FC = () => {
 
   const [todos, setTodos] = useState<TodoItem[]>([
     { id: '1', text: 'Review pending weed detections', completed: false },
-    { id: '2', text: 'Update YOLO model weights', completed: false },
+    { id: '2', text: 'Update YOLOv11 model weights', completed: false },
     { id: '3', text: 'Generate monthly detection report', completed: true },
     { id: '4', text: 'Check camera calibration settings', completed: false },
   ]);
@@ -96,11 +96,26 @@ export const AdminDashboard: React.FC = () => {
 
   // Generate chart data from detections
   const generateChartData = (detectionsList: Detection[]) => {
-    // Last 7 days data
+
+    // Safe helper: handles Firebase Timestamp OR plain JS Date
+    const getDate = (ts: any): Date | null => {
+      try {
+        if (!ts) return null;
+        if (typeof ts.toDate === 'function') return ts.toDate();
+        if (ts instanceof Date) return ts;
+        if (typeof ts.seconds === 'number') return new Date(ts.seconds * 1000);
+        return new Date(ts);
+      } catch {
+        return null;
+      }
+    };
+
+    // Build last 7 days keyed by ISO date string "YYYY-MM-DD"
     const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const date = startOfDay(subDays(new Date(), 6 - i));
+      const d = startOfDay(subDays(new Date(), 6 - i));
       return {
-        date: format(date, 'MMM dd'),
+        isoKey: format(d, 'yyyy-MM-dd'),
+        date: format(d, 'MMM dd'),
         weeds: 0,
         crops: 0,
         total: 0,
@@ -108,24 +123,25 @@ export const AdminDashboard: React.FC = () => {
     });
 
     detectionsList.forEach(detection => {
-      const detectionDate = detection.timestamp.toDate();
-      const dayIndex = last7Days.findIndex(day => {
-        const dayDate = new Date(day.date + ', ' + new Date().getFullYear());
-        return format(startOfDay(detectionDate), 'MMM dd') === day.date;
-      });
+      const detDate = getDate(detection.timestamp);
+      if (!detDate) return;
 
-      if (dayIndex !== -1) {
-        last7Days[dayIndex].weeds += detection.weedsDetected;
-        last7Days[dayIndex].crops += detection.cropsDetected;
-        last7Days[dayIndex].total += 1;
+      const isoKey = format(startOfDay(detDate), 'yyyy-MM-dd');
+      const dayEntry = last7Days.find(d => d.isoKey === isoKey);
+
+      if (dayEntry) {
+        dayEntry.weeds += Number(detection.weedsDetected) || 0;
+        dayEntry.crops += Number(detection.cropsDetected) || 0;
+        dayEntry.total += 1;
       }
     });
 
-    setChartData(last7Days);
+    // Strip the internal key before passing to recharts
+    setChartData(last7Days.map(({ isoKey: _isoKey, ...rest }) => rest));
 
     // Pie chart data
-    const totalWeeds = detectionsList.reduce((sum, d) => sum + d.weedsDetected, 0);
-    const totalCrops = detectionsList.reduce((sum, d) => sum + d.cropsDetected, 0);
+    const totalWeeds = detectionsList.reduce((sum, d) => sum + (Number(d.weedsDetected) || 0), 0);
+    const totalCrops = detectionsList.reduce((sum, d) => sum + (Number(d.cropsDetected) || 0), 0);
 
     setPieData([
       { name: 'Weeds', value: totalWeeds, color: '#ef4444' },
@@ -228,7 +244,7 @@ export const AdminDashboard: React.FC = () => {
     onClick: () => void;
   }) => (
     <Card
-      className="glass-effect border-white/20 hover:border-primary/30 transition-all cursor-pointer hover:scale-105"
+      className="border-0 shadow-sm hover:shadow-md transition-all cursor-pointer hover:scale-[1.02]" style={{ background: '#ffffff', borderRadius: '20px' }}
       onClick={onClick}
     >
       <CardHeader className="pb-3">
@@ -248,19 +264,19 @@ export const AdminDashboard: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background cyber-grid">
+    <div className="min-h-screen" style={{ background: '#f8f9f6' }}>
       <Toaster position="top-right" />
 
       {/* Header */}
-      <header className="glass-effect border-b border-white/10 sticky top-0 z-50 backdrop-blur-xl">
+      <header className="border-b sticky top-0 z-50 backdrop-blur-xl" style={{ background: '#0a3d2e', borderColor: 'rgba(255,255,255,0.08)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-accent/20 border border-accent/30">
-              <Shield size={24} className="text-accent" />
+            <div className="p-2 rounded-xl" style={{ background: '#d4f04d' }}>
+              <Shield size={24} style={{ color: '#0a3d2e' }} />
             </div>
             <div>
-              <h1 className="text-xl font-bold gradient-text">AgriVision Admin</h1>
-              <p className="text-xs text-muted-foreground">Real-time Dashboard</p>
+              <h1 className="text-xl font-bold text-white">Agri<span className="serif-accent" style={{ color: '#d4f04d' }}>Vision</span> Admin</h1>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>Real-time Dashboard</p>
             </div>
           </div>
 
@@ -278,11 +294,11 @@ export const AdminDashboard: React.FC = () => {
 
             <div className="flex items-center gap-3">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-medium">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">{user?.email}</p>
+                <p className="text-sm font-medium text-white">{user?.name}</p>
+                <p className="text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>{user?.email}</p>
               </div>
-              <Avatar className="border-2 border-accent/30">
-                <AvatarFallback className="bg-accent/20 text-accent font-semibold">
+              <Avatar className="border-2" style={{ borderColor: '#d4f04d' }}>
+                <AvatarFallback className="font-semibold" style={{ background: '#d4f04d', color: '#0a3d2e' }}>
                   {user?.name?.charAt(0).toUpperCase()}
                 </AvatarFallback>
               </Avatar>
@@ -304,7 +320,7 @@ export const AdminDashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-2">
-            Welcome back, <span className="gradient-text">{user?.name}</span>!
+            Welcome back, <span className="serif-accent" style={{ color: '#0a3d2e' }}>{user?.name}</span>!
           </h2>
           <p className="text-muted-foreground">
             Monitor system performance, manage detections, and track analytics in real-time
@@ -365,7 +381,7 @@ export const AdminDashboard: React.FC = () => {
         {/* Charts Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Line Chart */}
-          <Card className="glass-effect border-white/20">
+          <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp size={20} />
@@ -395,7 +411,7 @@ export const AdminDashboard: React.FC = () => {
           </Card>
 
           {/* Pie Chart */}
-          <Card className="glass-effect border-white/20">
+          <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px' }}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 size={20} />
@@ -436,7 +452,7 @@ export const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Detection History Table */}
           <div className="lg:col-span-2">
-            <Card className="glass-effect border-white/20">
+            <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px' }}>
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -480,7 +496,8 @@ export const AdminDashboard: React.FC = () => {
                   <Table>
                     <TableHeader>
                       <TableRow className="border-white/10 hover:bg-muted/50">
-                        <TableHead>Filename</TableHead>
+                        <TableHead>Filename / Source</TableHead>
+                        <TableHead>User</TableHead>
                         <TableHead>Timestamp</TableHead>
                         <TableHead className="text-center">Weeds</TableHead>
                         <TableHead className="text-center">Crops</TableHead>
@@ -499,9 +516,24 @@ export const AdminDashboard: React.FC = () => {
                       ) : (
                         filteredDetections.slice(0, 10).map((detection) => (
                           <TableRow key={detection.id} className="border-white/10 hover:bg-muted/30">
-                            <TableCell className="font-medium">{detection.filename}</TableCell>
+                            <TableCell className="font-medium max-w-[180px]">
+                              <span className="block truncate text-xs" title={detection.filename}>
+                                {detection.filename.startsWith('realtime_') ? '🎥 ' : '📷 '}
+                                {detection.filename.replace(/^realtime_[^_]+_/, '').replace(/\.jpg$/, '')}
+                              </span>
+                              {detection.batchId && (
+                                <span className="text-[10px] text-muted-foreground">
+                                  {detection.filename.startsWith('realtime_') ? 'Real-time' : `Batch: ${detection.batchId.slice(-6)}`}
+                                </span>
+                              )}
+                            </TableCell>
+                            <TableCell className="text-xs text-muted-foreground">
+                              {(detection as any).userEmail || detection.userId}
+                            </TableCell>
                             <TableCell className="text-sm text-muted-foreground">
-                              {format(detection.timestamp.toDate(), 'MMM dd, yyyy HH:mm')}
+                              {detection.timestamp
+                                ? format(detection.timestamp.toDate(), 'MMM dd, HH:mm')
+                                : '—'}
                             </TableCell>
                             <TableCell className="text-center">
                               <span className="font-semibold text-destructive">{detection.weedsDetected}</span>
@@ -541,7 +573,7 @@ export const AdminDashboard: React.FC = () => {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Todo List */}
-            <Card className="glass-effect border-white/20">
+            <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <CheckCircle2 size={20} />
@@ -610,7 +642,7 @@ export const AdminDashboard: React.FC = () => {
             </Card>
 
             {/* Activity Feed */}
-            <Card className="glass-effect border-white/20">
+            <Card className="border-0 shadow-sm" style={{ background: '#ffffff', borderRadius: '20px' }}>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Activity size={20} />
