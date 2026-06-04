@@ -1,22 +1,20 @@
 import { AnalysisResult } from "../types";
 
 const getAPIURL = () => {
-  // Prefer explicit env override (set this to your ngrok URL for remote access)
+  // Prefer explicit env override
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
 
   const host = window.location.hostname;
 
-  // Local development — Flask always on 5000 via HTTP
+  // Local development
   if (host === 'localhost' || host === '127.0.0.1') {
     return `http://localhost:5000`;
   }
 
-  // LAN access (e.g. https://192.168.1.x:3000): Flask is still plain HTTP on port 5000.
-  // Mixed-content will be blocked by Chrome unless VITE_API_URL points to the ngrok HTTPS URL.
-  // We still try HTTP here; if blocked, user must set VITE_API_URL=<ngrok-url> in .env
-  return `http://${host}:5000`;
+  // Production — always use the Render backend
+  return `https://agri-weed.onrender.com`;
 };
 
 const API_URL = getAPIURL();

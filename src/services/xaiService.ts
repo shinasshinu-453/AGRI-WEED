@@ -8,7 +8,8 @@ const getAPIURL = () => {
     if (host === 'localhost' || host === '127.0.0.1') {
         return `http://localhost:5000`;
     }
-    return `http://${host}:5000`;
+    // Production — always use the Render backend
+    return `https://agri-weed.onrender.com`;
 };
 
 const API_URL = getAPIURL();
