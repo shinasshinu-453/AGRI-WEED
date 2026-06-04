@@ -1,20 +1,10 @@
-path: C:/dataset/wheat_yolo_dataset        # Use forward slashes for YOLO
+path: C:/dataset/wheat_yolo_dataset        # dataset root
 train: C:/dataset/wheat_yolo_dataset/images/train
-val: C:/dataset/wheat_yolo_dataset/images/val
+val:   C:/dataset/wheat_yolo_dataset/images/val
+test:  C:/dataset/wheat_yolo_dataset/images/test
 
 nc: 12
 names:
-  [
-    "waterhemp",
-    "morningglory",
-    "ragweed",
-    "cocklebur",
-    "spurred_anteria",
-    "prickly_sida",
-    "velvetleaf",
-    "palmer_amaranth",
-    "redroot_pigweed",
-    "johnsongrass",
-    "tall_morningglory",
-    "sicklepod"
-  ]
+  ["waterhemp", "morningglory", "ragweed", "cocklebur",
+   "spurred_anteria", "prickly_sida", "velvetleaf", "palmer_amaranth",
+   "redroot_pigweed", "johnsongrass", "tall_morningglory", "sicklepod"]

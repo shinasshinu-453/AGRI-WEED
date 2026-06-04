@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Connection Test</title>
+</head>
+<body>
+    <h1>Testing Backend Connection</h1>
+    <button onclick="testBackend()">Test Backend</button>
+    <pre id="result"></pre>
+    
+    <script>
+        async function testBackend() {
+            const resultEl = document.getElementById('result');
+            resultEl.textContent = 'Testing...';
+            
+            try {
+                // Test 1: Health endpoint
+                console.log('Testing /health endpoint...');
+                const healthRes = await fetch('http://localhost:5000/health');
+                const healthData = await healthRes.json();
+                resultEl.textContent = `✅ Health endpoint works!\n${JSON.stringify(healthData, null, 2)}\n\n`;
+                
+                // Test 2: Analyze endpoint with dummy data
+                console.log('Testing /analyze endpoint...');
+                const analyzeRes = await fetch('http://localhost:5000/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: 'dGVzdA==',  // base64 "test"
+                        cropName: 'Wheat'
+                    })
+                });
+                
+                const analyzeData = await analyzeRes.json();
+                resultEl.textContent += `\n/analyze response:\n${JSON.stringify(analyzeData, null, 2)}`;
+                
+            } catch (error) {
+                resultEl.textContent = `❌ Error: ${error.message}\n\nThis likely means:\n1. Server not running on port 5000\n2. CORS issue\n3. Network/firewall blocking localhost`;
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>
