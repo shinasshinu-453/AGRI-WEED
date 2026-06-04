@@ -29,7 +29,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY server.py .
-COPY .env .
 
 # Copy model weights if present (models/best.pt or yolov8n.pt)
 # The model file should be placed in models/ directory
