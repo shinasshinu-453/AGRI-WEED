@@ -30,16 +30,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY server.py .
 
-# Copy model weights if present (models/best.pt or yolov8n.pt)
-# The model file should be placed in models/ directory
+# Copy model weights (models/best.pt)
 COPY models/ models/
 
-# Expose port (Render uses PORT env var)
-EXPOSE 5000
+# Expose port — Render injects PORT env var (usually 10000)
+EXPOSE 10000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=60s --retries=3 \
-    CMD python -c "import requests; requests.get('http://localhost:${PORT:-5000}/health', timeout=5)" || exit 1
-
-# Start server
-CMD ["python", "server.py"]
+# Start with gunicorn — reads PORT env var automatically
+# --timeout 300: allow 5 min for YOLO model to load on first request
+# --preload: load app before forking workers (loads YOLO once)
+CMD gunicorn server:app \
+    --bind 0.0.0.0:${PORT:-10000} \
+    --workers 1 \
+    --timeout 300 \
+    --preload \
+    --log-level info
